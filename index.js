@@ -1,6 +1,12 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+/**
+ * @type {"default"|"scaleUp"|"scaleDown"} animationState - The current state of the animation
+ */
+
+let animationState = 'default';
+
 let defaultAnimation;
 let scaleUpAnimation;
 let scaleDownAnimation;
@@ -179,18 +185,24 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize);
 
 scaleUpButton.addEventListener('click', () => {
+  if (animationState === 'scaleUp') return;
+  animationState = 'scaleUp';
   cancelAnimationFrame(defaultAnimation);
   cancelAnimationFrame(scaleDownAnimation);
   scaleUpAnimation = requestAnimationFrame(scaleUpAnime);
 });
 
 scaleDownButton.addEventListener('click', () => {
+  if (animationState === 'scaleDown') return;
+  animationState = 'scaleDown';
   cancelAnimationFrame(defaultAnimation);
   cancelAnimationFrame(scaleUpAnimation);
   scaleDownAnimation = requestAnimationFrame(scaleDownAnime);
 });
 
 resetButton.addEventListener('click', () => {
+  if (animationState === 'default') return;
+  animationState = 'default';
   cancelAnimationFrame(scaleUpAnimation);
   cancelAnimationFrame(scaleDownAnimation);
   defaultAnime();
