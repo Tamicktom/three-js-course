@@ -11,6 +11,22 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      gap: 8px;
     }
   </style>
   <script type="importmap">
@@ -25,7 +41,12 @@
 </head>
 
 <body>
-
+  <div id="app"></div>
+  <div id="controls">
+    <button id="scale-up">Aumentar</button>
+    <button id="scale-down">Diminuir</button>
+    <button id="reset">Reset</button>
+  </div>
 </body>
 
 </html>

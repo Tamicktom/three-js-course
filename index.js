@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+let defaultAnimation;
+let scaleUpAnimation;
+let scaleDownAnimation;
+
 //* Grab the window width and height
 const sizes = {
   width: window.innerWidth,
@@ -16,7 +20,12 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor(0x000000, 0);
 
-document.body.appendChild(renderer.domElement);
+const app = document.querySelector('#app');
+app.appendChild(renderer.domElement);
+
+const scaleUpButton = document.querySelector('#scale-up');
+const scaleDownButton = document.querySelector('#scale-down');
+const resetButton = document.querySelector('#reset');
 
 const fov = 75;
 const aspect = sizes.width / sizes.height;
@@ -38,6 +47,14 @@ const geo = new THREE.IcosahedronGeometry(0.7, 1);
 const mat = generateGradientMaterial('#FEAC5E', '#C779D0', '#4BC0C8', '#C779D0', '#FEAC5E');
 const mesh = new THREE.Mesh(geo, mat);
 
+//make the mesh glow
+const glow = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
+  color: "#fff",
+  side: THREE.BackSide
+}));
+glow.scale.setScalar(1.01);
+mesh.add(glow);
+
 //line that show the axis
 const axesHelper = new THREE.AxesHelper(1);
 scene.add(axesHelper);
@@ -54,18 +71,63 @@ mesh.add(line);
 
 scene.add(mesh);
 
-//create light
+// create light
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x080820, 1);
 scene.add(hemiLight);
 
-function animate() {
-  requestAnimationFrame(animate);
+const light = new THREE.DirectionalLight(0xffffff, 0.3);
+light.position.set(5, 5, 5);
+scene.add(light);
 
-  mesh.scale.setScalar(1 + Math.sin(Date.now() * 0.001) * 0.1);
+// create particles (colorfull triangles) that rotate around the sphere
+const particles = new THREE.Group();
+scene.add(particles);
+
+const particleGeo = new THREE.TetrahedronGeometry(0.01, 0);
+const particleMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff
+});
+
+for (let i = 0; i < 5000; i++) {
+  const particle = new THREE.Mesh(particleGeo, particleMat);
+  particles.add(particle);
+
+  const [x, y, z] = Array(3).fill().map(() => (Math.random() - 0.5) * 10);
+  particle.position.set(x, y, z);
+}
+
+function defaultAnime() {
+  defaultAnimation = requestAnimationFrame(defaultAnime);
+
   mesh.rotation.y += 0.005;
 
   //make the line be a little bit bigger than the mesh
   line.scale.setScalar(1.001);
+
+  //make the particles rotate around the sphere
+  particles.rotation.y += 0.001;
+
+  renderer.render(scene, camera);
+  controls.update();
+}
+
+function scaleUpAnime() {
+  scaleUpAnimation = requestAnimationFrame(scaleUpAnime);
+
+  mesh.scale.x += 0.01;
+  mesh.scale.y += 0.01;
+  mesh.scale.z += 0.01;
+
+  renderer.render(scene, camera);
+  controls.update();
+}
+
+function scaleDownAnime() {
+  scaleDownAnimation = requestAnimationFrame(scaleDownAnime);
+
+  mesh.scale.x -= 0.01;
+  mesh.scale.y -= 0.01;
+  mesh.scale.z -= 0.01;
 
   renderer.render(scene, camera);
   controls.update();
@@ -102,7 +164,7 @@ function generateGradientMaterial(...colors) {
   });
 }
 
-animate();
+defaultAnime();
 
 function onWindowResize() {
   sizes.width = window.innerWidth;
@@ -115,3 +177,21 @@ function onWindowResize() {
 }
 
 window.addEventListener('resize', onWindowResize);
+
+scaleUpButton.addEventListener('click', () => {
+  cancelAnimationFrame(defaultAnimation);
+  cancelAnimationFrame(scaleDownAnimation);
+  scaleUpAnimation = requestAnimationFrame(scaleUpAnime);
+});
+
+scaleDownButton.addEventListener('click', () => {
+  cancelAnimationFrame(defaultAnimation);
+  cancelAnimationFrame(scaleUpAnimation);
+  scaleDownAnimation = requestAnimationFrame(scaleDownAnime);
+});
+
+resetButton.addEventListener('click', () => {
+  cancelAnimationFrame(scaleUpAnimation);
+  cancelAnimationFrame(scaleDownAnimation);
+  defaultAnime();
+});
