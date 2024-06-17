@@ -86,12 +86,29 @@ const particles = new THREE.Group();
 scene.add(particles);
 
 const particleGeo = new THREE.TetrahedronGeometry(0.01, 0);
-const particleMat = new THREE.MeshStandardMaterial({
-  color: 0xffffff
-});
+const particleMat = [
+  new THREE.MeshBasicMaterial({
+    color: '#ff0000'
+  }),
+  new THREE.MeshBasicMaterial({
+    color: '#00ff00'
+  }),
+  new THREE.MeshBasicMaterial({
+    color: '#0000ff'
+  }),
+  new THREE.MeshBasicMaterial({
+    color: '#ffff00'
+  }),
+  new THREE.MeshBasicMaterial({
+    color: '#ff00ff'
+  }),
+  new THREE.MeshBasicMaterial({
+    color: '#00ffff'
+  }),
+];
 
 for (let i = 0; i < 5000; i++) {
-  const particle = new THREE.Mesh(particleGeo, particleMat);
+  const particle = new THREE.Mesh(particleGeo, particleMat[Math.floor(Math.random() * 6)]);
   particles.add(particle);
 
   const [x, y, z] = Array(3).fill().map(() => (Math.random() - 0.5) * 10);
