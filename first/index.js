@@ -33,7 +33,7 @@ const scaleUpButton = document.querySelector('#scale-up');
 const scaleDownButton = document.querySelector('#scale-down');
 const resetButton = document.querySelector('#reset');
 
-const fov = 75;
+const fov = 50;
 const aspect = sizes.width / sizes.height;
 const near = 0.1;
 const far = 10;
@@ -61,14 +61,10 @@ const glow = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
 glow.scale.setScalar(1.01);
 mesh.add(glow);
 
-//line that show the axis
-const axesHelper = new THREE.AxesHelper(1);
-scene.add(axesHelper);
-
 //line that follow the mesh, it show where the sphere has been
 const line = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
   color: 0xffffff,
-  wireframe: true
+  wireframe: true,
 }));
 scene.add(line);
 
@@ -124,6 +120,9 @@ function scaleUpAnime() {
   mesh.scale.y += 0.01;
   mesh.scale.z += 0.01;
 
+  mesh.rotation.y += 0.005;
+  particles.rotation.y += 0.001;
+
   renderer.render(scene, camera);
   controls.update();
 }
@@ -134,6 +133,9 @@ function scaleDownAnime() {
   mesh.scale.x -= 0.01;
   mesh.scale.y -= 0.01;
   mesh.scale.z -= 0.01;
+
+  mesh.rotation.y += 0.005;
+  particles.rotation.y += 0.001;
 
   renderer.render(scene, camera);
   controls.update();
